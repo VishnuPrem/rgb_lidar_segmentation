@@ -189,7 +189,7 @@ def train(model, enc=False):
 				label.data
 			)
 
-
+		iouVal, iou_classes = iouEvalval.getIoU()
 		print('[bg]:{bg} [Car]:{car} [Ped]:{ped} [Bicy]:{bicy}'.format(
 					bg = iou_classes[0],
 					car = iou_classes[1],
