@@ -7,6 +7,7 @@ ARGS_BATCH_SIZE=2
 
 ARGS_MODEL = 'SqueezeSeg/'
 ARGS_SAVE_DIR = '/home/neil/squeezeSeg/Saved_model/' 
+ARGS_TRAIN_DIR = '/home/neil/squeezeSeg/'
 ARGS_CUDA = True
 
 OPT_LEARNING_RATE_INIT 	= 5e-4

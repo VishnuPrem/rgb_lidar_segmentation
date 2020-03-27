@@ -51,7 +51,7 @@ if __name__ == "__main__":
 	loader = DataLoader(
 		dataset_train,
 		num_workers = 6,
-		batch_size = 3,
+		batch_size = 10,
 		shuffle = True)
 	
 

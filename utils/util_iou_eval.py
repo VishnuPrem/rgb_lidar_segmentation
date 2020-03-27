@@ -52,10 +52,6 @@ class iouEval:
         else:
             ignores=0
 
-        #print(type(x_onehot))
-        #print(type(y_onehot))
-        #print(x_onehot.size())
-        #print(y_onehot.size())
 
         tpmult = x_onehot * y_onehot    #times prediction and gt coincide is 1
         tp = torch.sum(torch.sum(torch.sum(tpmult, dim=0, keepdim=True), dim=2, keepdim=True), dim=3, keepdim=True).squeeze()

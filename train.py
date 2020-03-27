@@ -23,6 +23,7 @@ from dataloader import SemanticSegmentation
 from config import *
 from SqueezeSeg import SqueezeSeg
 from utils.util_iou_eval import iouEval, getColorEntry
+from utils.calculate_weights import load_class_weights
 
 class ImageTransform(object):
 	def __init__(self,width):
@@ -91,7 +92,12 @@ def train(model, enc=False):
 		batch_size = ARGS_BATCH_SIZE,
 		shuffle = True)
 
-	criterion = CrossEntropyLoss2d()
+	weight, num_images = load_class_weights()
+	print('Imbalance weights',weight)
+	if ARGS_CUDA:
+		weight = weight.cuda()
+		
+	criterion = CrossEntropyLoss2d(weight=weight)
 	savedir = ARGS_SAVE_DIR + ARGS_MODEL
 
 	if not os.path.exists(ARGS_SAVE_DIR):
