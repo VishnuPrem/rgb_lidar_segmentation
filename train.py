@@ -1,4 +1,4 @@
-# TODO: weighting classes
+# TODO: 
 
 
 
@@ -83,13 +83,13 @@ def train(model, enc=False):
 	loader = DataLoader(
 		dataset_train,
 		num_workers = ARGS_NUM_WORKERS,
-		batch_size = ARGS_BATCH_SIZE,
+		batch_size = ARGS_TRAIN_BATCH_SIZE,
 		shuffle = True)
 
 	loader_val = DataLoader(
 		dataset_val,
 		num_workers = ARGS_NUM_WORKERS,
-		batch_size = ARGS_BATCH_SIZE,
+		batch_size = ARGS_VAL_BATCH_SIZE,
 		shuffle = True)
 
 	weight, num_images = load_class_weights()
