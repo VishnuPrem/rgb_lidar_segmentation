@@ -1,4 +1,6 @@
-# TODO: 
+# TODO: tensorboardX
+# TODO: Best model saver
+# TODO: use pretrained backbone from pytorch
 
 
 
@@ -13,6 +15,7 @@ import pdb
 import sys
 import numpy as np
 from PIL import Image, ImageOps
+import torchvision.models as models
 
 from torch.optim import SGD, Adam, lr_scheduler
 from torch.autograd import Variable
@@ -60,6 +63,38 @@ class CrossEntropyLoss2d(torch.nn.Module):
 
 	def forward(self, outputs, targets):
 		return self.loss(torch.nn.functional.log_softmax(outputs, dim=1),targets)
+
+def load_pretrained(model,squeezenet):
+	name_squeezenet = [i for i,_ in squeezenet.state_dict().items()]
+	param_squeezenet = [i for _,i in squeezenet.state_dict().items()]
+	names_model = [i for i,_ in model.state_dict().items()]
+	
+	name_squeezenet.insert(2,0)
+	name_squeezenet.insert(2,0)
+	new_list = [0]*50
+	name_squeezenet.extend(new_list)
+	param_squeezenet.insert(2,0)
+	param_squeezenet.insert(2,0)
+	param_squeezenet.extend(new_list)
+	i = 0
+	
+	new_dict = model.state_dict().copy()
+	for name, param in model.state_dict().items():
+		squeeze_name = name_squeezenet[i]
+		squeeze_param = param_squeezenet[i]
+		if squeeze_name == 0:
+			pass
+		elif name == 'fire10.layer_1.conv.weight':
+			pass
+		elif name == 'fire10.layer_1.conv.bias':
+			pass
+		else:
+			print(name)
+			new_dict[name] = squeeze_param
+		i += 1
+
+	model.load_state_dict(new_dict)
+
 
 def train(model, enc=False):
 	best_acc = 0
@@ -120,9 +155,12 @@ def train(model, enc=False):
 	lambda1 = lambda epoch: pow((1-((epoch-1)/ARGS_NUM_EPOCHS)),0.9)
 	scheduler = lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda1)
 
+	best_iou = 0
+
 	for epoch in range(ARGS_NUM_EPOCHS+1):
 		print("\n ---------------- [TRAINING] Epoch #", epoch, "------------------\n")
 		epoch_loss = []
+		val_epoch_loss = []
 		scheduler.step(epoch)
 		model.train()
 		iouEvalTrain = iouEval(NUM_CLASSES)
@@ -182,7 +220,9 @@ def train(model, enc=False):
 			label = Variable(label)
 
 			output = model(image)
+			loss = criterion(output,label[:,0])
 
+			val_epoch_loss.append(loss.item())
 
 			iouEvalval.addBatch(
 				output.max(1)[1].unsqueeze(1).data,
@@ -190,7 +230,15 @@ def train(model, enc=False):
 			)
 
 		iouVal, iou_classes = iouEvalval.getIoU()
-		print('[bg]:{bg} [Car]:{car} [Ped]:{ped} [Bicy]:{bicy}'.format(
+		avg_loss = sum(val_epoch_loss) / len(val_epoch_loss)
+		if iouVal>best_iou:
+			torch.save(model.state_dict(), savedir + '/model_best.pth')
+			print('[SAVED] Best Model')
+			best_iou = iouVal
+
+		print('[loss]:{loss} [avg_iou]:{iou} [bg]:{bg} [Car]:{car} [Ped]:{ped} [Bicy]:{bicy}'.format(
+					loss = avg_loss,
+					iou =  iouVal,
 					bg = iou_classes[0],
 					car = iou_classes[1],
 					ped = iou_classes[2],
@@ -198,6 +246,11 @@ def train(model, enc=False):
 
 if __name__ == '__main__':
 	model = SqueezeSeg(NUM_CLASSES)
+	
+	if ARGS_PRETRAINED:
+		squeezenet = models.squeezenet1_1(pretrained=True)
+		load_pretrained(model,squeezenet)
+
 	if ARGS_CUDA:
 		model = model.cuda()
 
