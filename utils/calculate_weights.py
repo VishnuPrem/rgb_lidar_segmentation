@@ -91,7 +91,7 @@ def calculate_class_weights(labels, n_classes, method = "paszke", c = 1.02):
 def main():
 
     image_list=[]
-    for (dirpath, dirnames, filenames) in walk('/home/neil/cis_522/squeezeSeg/data/train/'):
+    for (dirpath, dirnames, filenames) in walk(ROOT_DIR + 'train/'):
         for file in filenames:
             image_list+=[os.path.join(dirpath,file)]      
     
@@ -125,7 +125,7 @@ def main():
     data_l[data_l==-1]=0
     
     
-    print("[Camvid class weights] Calculating class weights")
+    print("[Camvid class weights] Calculating class weights for {} files".format(len(data_l)))
 
     weights = calculate_class_weights(data_l, 4)
     stats = calculate_mean_var(data_x,data_y,data_z,data_i,data_d)

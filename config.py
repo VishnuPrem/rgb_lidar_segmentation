@@ -1,4 +1,5 @@
-ROOT_DIR = '/home/neil/cis_522/squeezeSeg/data/CamVid/'
+ARGS_ROOT = '/home/neil/cis_522/squeezeSeg/'
+ROOT_DIR = ARGS_ROOT + 'data/'
 IMG_WIDTH = 512
 
 
@@ -11,8 +12,8 @@ ARGS_INPUT_TYPE = 'XYZDIRGB'
 
 
 ARGS_MODEL = 'SqueezeSeg_1/'
-ARGS_SAVE_DIR = '/home/neil/cis_522/squeezeSeg/Saved_model/' 
-ARGS_TRAIN_DIR = '/home/neil/cis_522/squeezeSeg/'
+ARGS_SAVE_DIR = ARGS_ROOT + 'Saved_model/' 
+ARGS_TRAIN_DIR = ARGS_ROOT
 ARGS_CUDA = True
 ARGS_PRETRAINED = True
 
