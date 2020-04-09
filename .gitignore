@@ -1,4 +1,4 @@
-data*
+data/*
 model_best*
 config.py
 __pycache__
