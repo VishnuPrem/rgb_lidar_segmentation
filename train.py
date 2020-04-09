@@ -89,7 +89,7 @@ def load_pretrained(model,squeezenet):
 		elif name == 'fire10.layer_1.conv.bias':
 			pass
 		else:
-			print(name)
+			#print(name)
 			new_dict[name] = squeeze_param
 		i += 1
 
@@ -158,10 +158,10 @@ def train(model, enc=False):
 	best_iou = 0
 
 	for epoch in range(ARGS_NUM_EPOCHS+1):
-		print("\n ---------------- [TRAINING] Epoch #", epoch, "------------------\n")
+		print("\n ---------------- Epoch #", epoch, "------------------\n")
 		epoch_loss = []
 		val_epoch_loss = []
-		scheduler.step(epoch)
+		
 		model.train()
 		iouEvalTrain = iouEval(NUM_CLASSES)
 		iouEvalval = iouEval(NUM_CLASSES)
@@ -189,14 +189,14 @@ def train(model, enc=False):
 
 			loss.backward()
 			optimizer.step()
-
+			scheduler.step(epoch)
 			epoch_loss.append(loss.item())
 			
 		
 		avg_loss = sum(epoch_loss) / len(epoch_loss)
 		iouTrain, iou_classes = iouEvalTrain.getIoU()
 		
-		print('[Average loss]:{avgloss} [Average IOU]:{iou_train} [bg]:{bg} [Car]:{car} [Ped]:{ped} [Bicy]:{bicy}'.format(
+		print('[TRAINING] [Average loss]:{avgloss} [Average IOU]:{iou_train} [bg]:{bg} [Car]:{car} [Ped]:{ped} [Bicy]:{bicy}'.format(
 					avgloss=avg_loss,
 					iou_train = iouTrain,
 					bg = iou_classes[0],
@@ -207,7 +207,7 @@ def train(model, enc=False):
 		model.eval()
 
 
-		print("\n ---------------- [VALIDATING] Epoch #", epoch, "------------------\n")
+		#print("\n ----------------  Epoch #", epoch, "------------------\n")
 
 		for step, (image,label) in enumerate(loader_val):
 			start_time = time.time()
@@ -231,18 +231,19 @@ def train(model, enc=False):
 
 		iouVal, iou_classes = iouEvalval.getIoU()
 		avg_loss = sum(val_epoch_loss) / len(val_epoch_loss)
-		if iouVal>best_iou:
-			torch.save(model.state_dict(), savedir + '/model_best.pth')
-			print('[SAVED] Best Model')
-			best_iou = iouVal
-
-		print('[loss]:{loss} [avg_iou]:{iou} [bg]:{bg} [Car]:{car} [Ped]:{ped} [Bicy]:{bicy}'.format(
+		
+		print('[VALIDATING] [loss]:{loss} [avg_iou]:{iou} [bg]:{bg} [Car]:{car} [Ped]:{ped} [Bicy]:{bicy}'.format(
 					loss = avg_loss,
 					iou =  iouVal,
 					bg = iou_classes[0],
 					car = iou_classes[1],
 					ped = iou_classes[2],
 					bicy = iou_classes[3]))
+
+		if iouVal>best_iou:
+			torch.save(model.state_dict(), savedir + '/model_best.pth')
+			print('[SAVED] Best Model')
+			best_iou = iouVal
 
 if __name__ == '__main__':
 	model = SqueezeSeg(NUM_CLASSES)

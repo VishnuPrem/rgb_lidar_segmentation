@@ -1,13 +1,16 @@
-import numpy as np
 import os
 import pdb
+import torch
+import random
+import numpy as np
+from os import walk
+from config import *
 from PIL import Image
 from torch.utils.data import Dataset
-import torch
-from torchvision.transforms import ToTensor, ToPILImage, Resize, RandomCrop
 from torch.utils.data import DataLoader
+from torchvision.transforms import ToTensor, ToPILImage, Resize, RandomCrop
+from utils.calculate_weights import load_datastats
 
-import random
 
 def load_image(file):
 	return Image.open(file)
@@ -15,7 +18,7 @@ def load_image(file):
 def image_path(root, basename):
 	return os.path.join(root,basename)
 
-class SemanticSegmentation:
+class Image_SemanticSegmentation:
 	def __init__(self, root,split,co_transforms=None):
 		self.root = root
 		with open(os.path.join(root,split+'.txt')) as f:
@@ -41,12 +44,68 @@ class SemanticSegmentation:
 	def __len__(self):
 		return len(self.image_list)
 
+class Squeeze_Seg:
+	def __init__(self, root,split,format_,co_transforms=None):
+		self.root = os.path.join(root, split)
 
+		self.data_stats = load_datastats()
+		print('[STATS] \n[Mean]:    {} \n[Std_dev]: {}'.format(self.data_stats[0,:,0].T,self.data_stats[0,:,1].T))
+
+		self.format = format_
+
+		self.image_list=[]
+		for (dirpath, dirnames, filenames) in walk(self.root):
+			for file in filenames:
+				self.image_list+=[os.path.join(dirpath,file)]
+		
+		self.image_list.sort()
+		self.co_transform = co_transforms
+		print('[Dataloader] Loaded {} files'.format(len(self.image_list)))
+		
+	def __getitem__(self,index):
+		filename = self.image_list[index]
+
+		data = np.load(filename) # x,y,z,reflectance,depth,label,rgb
+		data_rep = {}
+		
+		invalid_points = np.argwhere(data[:,:,0]==-1)
+		data_rep['X'] = ToTensor()(data[:,:,0]-self.data_stats[0,0,0])/self.data_stats[0,0,1]
+		data_rep['Y'] = ToTensor()(data[:,:,1]-self.data_stats[0,1,0])/self.data_stats[0,1,1]
+		data_rep['Z'] = ToTensor()(data[:,:,2]-self.data_stats[0,2,0])/self.data_stats[0,2,1]
+		data_rep['I'] = ToTensor()(data[:,:,3]-self.data_stats[0,3,0])/self.data_stats[0,3,1]
+		data_rep['D'] = ToTensor()(data[:,:,4]-self.data_stats[0,4,0])/self.data_stats[0,4,1]
+		data_rep['R'] = ToTensor()(data[:,:,6])
+		data_rep['G'] = ToTensor()(data[:,:,7])
+		data_rep['B'] = ToTensor()(data[:,:,8])
+		
+
+		data_rep['X'][0][invalid_points.T], \
+		data_rep['Y'][0][invalid_points.T], \
+		data_rep['Z'][0][invalid_points.T], \
+		data_rep['I'][0][invalid_points.T], \
+		data_rep['D'][0][invalid_points.T] = -1,-1,-1,-1,-1
+
+		
+		lidar_mask = torch.from_numpy((data[:,:,4]>0)*1).long().unsqueeze(0)
+
+		inputs = torch.zeros((len(self.format),64,512),dtype = torch.float)
+		
+		for val,i in enumerate(self.format):
+			inputs[val]=data_rep[i]
+
+
+		label = torch.from_numpy(data[:,:,5]).long().unsqueeze(0)
+			
+
+		return inputs,lidar_mask,label
+
+	def __len__(self):
+		return len(self.image_list)
 
 
 if __name__ == "__main__":
-	co_transforms = ImageTransform(width=512)
-	dataset_train = SemanticSegmentation('/home/neil/squeezeSeg/Camvid/CamVid/','train',co_transforms)
+
+	dataset_train = Squeeze_Seg('/home/neil/cis_522/squeezeSeg/data/','train',ARGS_INPUT_TYPE)
 	
 	loader = DataLoader(
 		dataset_train,
@@ -55,5 +114,5 @@ if __name__ == "__main__":
 		shuffle = True)
 	
 
-	for image ,label in loader:
-		pdb.set_trace()
+	for image,mask,label in loader:
+		print(image.shape)
