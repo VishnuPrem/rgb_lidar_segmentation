@@ -1,10 +1,13 @@
 import torch
 import pdb
+import sys
+sys.path.append('../../')
+from config import *
 import torch.nn as nn
 import torch.nn.functional as F
 from bilateral import BilateralFilter
 from recurrent import Recurrent	
-from data_value import data_value_config
+#from data_value import data_value_config
 
 class Conv(nn.Module):
 	def __init__(self, in_channels, out_channels, kernel_size=3,stride=1, padding=1):
@@ -137,11 +140,11 @@ class SqueezeSeg(nn.Module):
 if __name__ == "__main__":
 	import numpy as np
 	x = torch.tensor(np.random.rand(2,5,64,512).astype(np.float32))
-	data_dict = data_value_config()
-	model = SqueezeSeg(data_dict)
+	
+	model = SqueezeSeg(data_dict).cuda()
 	mask = torch.tensor(np.random.rand(2,1,64,512).astype(np.float32))
-	y = model(x,mask)
+	y = model(x.cuda(),mask.cuda())
 	print('output shape:', y.shape)
 	pdb.set_trace()
-	assert y.shape == (2,4,64,512), 'output shape (2,9,64,512) is expected!'
+	assert y.shape == (2,4,64,512), 'output shape (2,4,64,512) is expected!'
 	print('test ok!')

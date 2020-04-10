@@ -63,12 +63,3 @@ class Recurrent(nn.Module):
 			x = outputs
 
 		return outputs
-
-
-
-
-
-
-
-
-

@@ -24,7 +24,7 @@ class BilateralFilter(nn.Module):
 		condensed_input = F.conv2d(x, weight=condensing_kernel.to(device), stride=self.stride, padding=self.padding)
 		diff_x = x[:,0,:,:].view(batch,1,zenith,azimuth) - condensed_input[:,0::in_channel,:,:]
 		diff_y = x[:,1,:,:].view(batch,1,zenith,azimuth) - condensed_input[:,1::in_channel,:,:]
-		diff_z = x[:,2,:,:].view(batch,1,zenith,azimuth) - condensed_input[:,2:in_channel,:,:]
+		diff_z = x[:,2,:,:].view(batch,1,zenith,azimuth) - condensed_input[:,2::in_channel,:,:]
 		bi_filters = []
 
 		for i in range(data_dict.NUM_CLASSES):
