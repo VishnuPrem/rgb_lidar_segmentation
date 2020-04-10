@@ -1,8 +1,10 @@
 import torch
+import pdb
 import torch.nn as nn
 import torch.nn.functional as F
 from bilateral import BilateralFilter
 from recurrent import Recurrent	
+from data_value import data_value_config
 
 class Conv(nn.Module):
 	def __init__(self, in_channels, out_channels, kernel_size=3,stride=1, padding=1):
@@ -72,8 +74,8 @@ class SqueezeSeg(nn.Module):
 		super(SqueezeSeg, self).__init__()
 
 		self.data_value = data_value
-		self.conv1 = Conv(3, 64, 3, stride=(1,2), padding=1)
-		self.conv1_skip = Conv(3, 64, 1, stride=1, padding=0)
+		self.conv1 = Conv(5, 64, 3, stride=(1,2), padding=1)
+		self.conv1_skip = Conv(5, 64, 1, stride=1, padding=0)
 		self.pool1 = nn.MaxPool2d(kernel_size=3, stride=(1,2), padding=(1,0),ceil_mode=True)
 
 		self.fire2 = Fire(64, 16, 64)
@@ -133,10 +135,13 @@ class SqueezeSeg(nn.Module):
 
 
 if __name__ == "__main__":
-	# import numpy as np
-	# x = torch.tensor(np.random.rand(2,5,64,512).astype(np.float32))
-	# model = SqueezeSeg(NUM_CLASSES=9)
-	# y = model(x)
-	# print('output shape:', y.shape)
-	# assert y.shape == (2,9,64,512), 'output shape (2,9,64,512) is expected!'
-	# print('test ok!')
+	import numpy as np
+	x = torch.tensor(np.random.rand(2,5,64,512).astype(np.float32))
+	data_dict = data_value_config()
+	model = SqueezeSeg(data_dict)
+	mask = torch.tensor(np.random.rand(2,1,64,512).astype(np.float32))
+	y = model(x,mask)
+	print('output shape:', y.shape)
+	pdb.set_trace()
+	assert y.shape == (2,4,64,512), 'output shape (2,9,64,512) is expected!'
+	print('test ok!')
