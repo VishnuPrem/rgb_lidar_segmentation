@@ -93,7 +93,7 @@ class Squeeze_Seg:
 		for val,i in enumerate(self.format):
 			inputs[val]=data_rep[i]
 
-
+		data[:,:,5][data[:,:,5]==-1]=0
 		label = torch.from_numpy(data[:,:,5]).long().unsqueeze(0)
 			
 
@@ -115,4 +115,5 @@ if __name__ == "__main__":
 	
 
 	for image,mask,label in loader:
-		print(image.shape)
+		print(image.shape,label.shape,mask.shape)
+		pdb.set_trace()

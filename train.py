@@ -22,9 +22,9 @@ from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, ToPILImage, Resize
 
-from dataloader import SemanticSegmentation
+from dataloader import Squeeze_Seg
 from config import *
-from SqueezeSeg import SqueezeSeg
+from models.SqueezeSeg.SqueezeSeg import SqueezeSeg
 from utils.util_iou_eval import iouEval, getColorEntry
 from utils.calculate_weights import load_class_weights
 
@@ -105,15 +105,9 @@ def train(model, enc=False):
 
 	iouEvalTrain = iouEval(NUM_CLASSES)
 
-	dataset_train = SemanticSegmentation( 
-					root = ROOT_DIR,
-					split = 'train',
-					co_transforms = co_transforms)
+	dataset_train = Squeeze_Seg(ROOT_DIR,'train',ARGS_INPUT_TYPE)
 
-	dataset_val = SemanticSegmentation(
-					root = ROOT_DIR,
-					split = 'test',
-					co_transforms = co_transforms)
+	dataset_val = Squeeze_Seg(ROOT_DIR,'train',ARGS_INPUT_TYPE)
 
 	loader = DataLoader(
 		dataset_train,
@@ -127,7 +121,7 @@ def train(model, enc=False):
 		batch_size = ARGS_VAL_BATCH_SIZE,
 		shuffle = True)
 
-	weight, num_images = load_class_weights()
+	weight = load_class_weights()
 	print('Imbalance weights',weight)
 	if ARGS_CUDA:
 		weight = weight.cuda()
@@ -165,18 +159,21 @@ def train(model, enc=False):
 		model.train()
 		iouEvalTrain = iouEval(NUM_CLASSES)
 		iouEvalval = iouEval(NUM_CLASSES)
-		for step, (image,label) in enumerate(loader):
+		
+		for step, (image,mask,label) in enumerate(loader):
 			
 			start_time = time.time()
 
 			if ARGS_CUDA:
 				image = image.cuda()
 				label = label.cuda()
+				mask = mask.cuda()
 
 			image = Variable(image)
 			label = Variable(label)
-
-			output = model(image)
+			mask = Variable(mask)
+			
+			output = model(image,mask)
 
 
 			iouEvalTrain.addBatch(
@@ -209,17 +206,19 @@ def train(model, enc=False):
 
 		#print("\n ----------------  Epoch #", epoch, "------------------\n")
 
-		for step, (image,label) in enumerate(loader_val):
+		for step, (image,mask,label) in enumerate(loader_val):
 			start_time = time.time()
 
 			if ARGS_CUDA:
 				image = image.cuda()
 				label = label.cuda()
+				mask = mask.cuda()
 
 			image = Variable(image)
 			label = Variable(label)
+			mask = Variable(mask)
 
-			output = model(image)
+			output = model(image,mask)
 			loss = criterion(output,label[:,0])
 
 			val_epoch_loss.append(loss.item())
@@ -246,7 +245,7 @@ def train(model, enc=False):
 			best_iou = iouVal
 
 if __name__ == '__main__':
-	model = SqueezeSeg(NUM_CLASSES)
+	model = SqueezeSeg(data_dict)
 	
 	if ARGS_PRETRAINED:
 		squeezenet = models.squeezenet1_1(pretrained=True)

@@ -1,7 +1,13 @@
+import sys
 import torch
+
+from config import *
 import torch.nn as nn
 import torch.nn.functional as F
+import pdb
 
+from models.SqueezeSeg.recurrent import Recurrent	
+from models.SqueezeSeg.bilateral import BilateralFilter
 
 class Conv(nn.Module):
 	def __init__(self, in_channels, out_channels, kernel_size=3,stride=1, padding=1):
@@ -67,11 +73,12 @@ class FireDeconv(nn.Module):
 
 
 class SqueezeSeg(nn.Module):
-	def __init__(self, NUM_CLASSES):
+	def __init__(self, data_value):
 		super(SqueezeSeg, self).__init__()
 
-		self.conv1 = Conv(3, 64, 3, stride=(1,2), padding=1)
-		self.conv1_skip = Conv(3, 64, 1, stride=1, padding=0)
+		self.data_value = data_value
+		self.conv1 = Conv(5, 64, 3, stride=(1,2), padding=1)
+		self.conv1_skip = Conv(5, 64, 1, stride=1, padding=0)
 		self.pool1 = nn.MaxPool2d(kernel_size=3, stride=(1,2), padding=(1,0),ceil_mode=True)
 
 		self.fire2 = Fire(64, 16, 64)
@@ -94,9 +101,12 @@ class SqueezeSeg(nn.Module):
 		self.fire13 = FireDeconv(64, 16, 32)
 
 		self.drop = nn.Dropout2d()
-		self.conv14 = nn.Conv2d(64,NUM_CLASSES,kernel_size=3,stride=1,padding=1)
+		self.conv14 = nn.Conv2d(64,self.data_value.NUM_CLASSES,kernel_size=3,stride=1,padding=1)
+		self.bf = BilateralFilter(self.data_value, stride=1, padding = (1,2))
+		self.rc = Recurrent(self.data_value, stride=1, padding=(1,2))
 
-	def forward(self, x):
+
+	def forward(self, x,lidar_mask):
 
 		out_c1 = self.conv1(x)
 		out = self.pool1(out_c1)
@@ -122,14 +132,19 @@ class SqueezeSeg(nn.Module):
 		out = self.drop(torch.add(out_1,out_2))
 
 		out = self.conv14(out)
+		bf_w = self.bf(x[:,:3,:,:])
+		out = self.rc(out,lidar_mask,bf_w)
 		return out
 
 
 if __name__ == "__main__":
 	import numpy as np
+	import pdb
 	x = torch.tensor(np.random.rand(2,5,64,512).astype(np.float32))
-	model = SqueezeSeg(NUM_CLASSES=9)
-	y = model(x)
+	
+	model = SqueezeSeg(data_dict).cuda()
+	mask = torch.tensor(np.random.rand(2,1,64,512).astype(np.float32))
+	y = model(x.cuda(),mask.cuda())
 	print('output shape:', y.shape)
-	assert y.shape == (2,9,64,512), 'output shape (2,9,64,512) is expected!'
+	assert y.shape == (2,4,64,512), 'output shape (2,4,64,512) is expected!'
 	print('test ok!')
