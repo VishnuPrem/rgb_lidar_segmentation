@@ -14,6 +14,7 @@ import pdb
 
 import sys
 import numpy as np
+import torch.nn as nn
 from PIL import Image, ImageOps
 import torchvision.models as models
 
@@ -250,6 +251,11 @@ if __name__ == '__main__':
 	if ARGS_PRETRAINED:
 		squeezenet = models.squeezenet1_1(pretrained=True)
 		load_pretrained(model,squeezenet)
+
+	model.conv1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE), 64, 3, stride=(1,2), padding=1)
+	model.conv1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE),64, 1, stride=1, padding=0)
+
+
 
 	if ARGS_CUDA:
 		model = model.cuda()

@@ -1,9 +1,9 @@
 SqueezeSeg(
   (conv1): Conv(
-    (conv): Conv2d(5, 64, kernel_size=(3, 3), stride=(1, 2), padding=(1, 1))
+    (conv): Conv2d(8, 64, kernel_size=(3, 3), stride=(1, 2), padding=(1, 1))
   )
   (conv1_skip): Conv(
-    (conv): Conv2d(5, 64, kernel_size=(1, 1), stride=(1, 1))
+    (conv): Conv2d(8, 64, kernel_size=(1, 1), stride=(1, 1))
   )
   (pool1): MaxPool2d(kernel_size=3, stride=(1, 2), padding=(1, 0), dilation=1, ceil_mode=True)
   (fire2): Fire(

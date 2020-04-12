@@ -56,7 +56,8 @@ class Squeeze_Seg:
 		self.image_list=[]
 		for (dirpath, dirnames, filenames) in walk(self.root):
 			for file in filenames:
-				self.image_list+=[os.path.join(dirpath,file)]
+				if file[-4:]=='.npy':
+					self.image_list+=[os.path.join(dirpath,file)]
 		
 		self.image_list.sort()
 		self.co_transform = co_transforms

@@ -128,7 +128,7 @@ class SqueezeSeg(nn.Module):
 
 		out_1 = self.fire13(out)
 		out_2 = self.conv1_skip(x)
-
+		
 		out = self.drop(torch.add(out_1,out_2))
 
 		out = self.conv14(out)
