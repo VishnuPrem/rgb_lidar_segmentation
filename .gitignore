@@ -1,5 +1,6 @@
+Saved_model/*
 data/*
 model_best*
 config.py
-__pycache__
+__pycache__/*
 *.pyc

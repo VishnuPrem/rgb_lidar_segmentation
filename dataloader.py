@@ -87,7 +87,7 @@ class Squeeze_Seg:
 		data_rep['D'][0][invalid_points.T] = -1,-1,-1,-1,-1
 
 		
-		lidar_mask = torch.from_numpy((data[:,:,4]>0)*1).long().unsqueeze(0)
+		lidar_mask = torch.from_numpy((data[:,:,4]>0)*1.).float().unsqueeze(0)
 
 		inputs = torch.zeros((len(self.format),64,512),dtype = torch.float)
 		

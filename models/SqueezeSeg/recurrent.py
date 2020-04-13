@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import utils.util_recurrent as util
 import pdb
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda")
 
 class Recurrent(nn.Module):
 	"""docstring for Recurrent
@@ -51,6 +51,8 @@ class Recurrent(nn.Module):
 			batch, in_channel, zenith, azimuth = list(inputs.size())
 			ang_output = F.conv2d(inputs, weight=angular_filters, stride=self.stride, padding=self.padding)
 			bi_ang_output = F.conv2d(inputs, weight=bi_angular_filters,stride=self.stride, padding=self.padding)
+			#pdb.set_padding
+			#mask = mask.float()
 			condensed_input = F.conv2d(inputs*mask, weight=condensing_kernel, stride=self.stride, padding=self.padding)
 			condensed_input = condensed_input.view(batch,in_channel,size_z*size_a-1,zenith,azimuth)
 			condensed_input = torch.sum((condensed_input * filters), 2)

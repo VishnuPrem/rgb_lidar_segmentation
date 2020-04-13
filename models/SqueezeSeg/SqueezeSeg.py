@@ -77,8 +77,8 @@ class SqueezeSeg(nn.Module):
 		super(SqueezeSeg, self).__init__()
 
 		self.data_value = data_value
-		self.conv1 = Conv(5, 64, 3, stride=(1,2), padding=1)
-		self.conv1_skip = Conv(5, 64, 1, stride=1, padding=0)
+		self.conv1 = Conv(3, 64, 3, stride=(1,2), padding=1)
+		self.conv1_skip = Conv(3, 64, 1, stride=1, padding=0)
 		self.pool1 = nn.MaxPool2d(kernel_size=3, stride=(1,2), padding=(1,0),ceil_mode=True)
 
 		self.fire2 = Fire(64, 16, 64)
@@ -132,8 +132,9 @@ class SqueezeSeg(nn.Module):
 		out = self.drop(torch.add(out_1,out_2))
 
 		out = self.conv14(out)
-		bf_w = self.bf(x[:,:3,:,:])
-		out = self.rc(out,lidar_mask,bf_w)
+		if ARGS_BRC:
+			bf_w = self.bf(x[:,:3,:,:])
+			out = self.rc(out,lidar_mask,bf_w)
 		return out
 
 

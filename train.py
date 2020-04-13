@@ -62,8 +62,23 @@ class CrossEntropyLoss2d(torch.nn.Module):
 		super().__init__()
 		self.loss = torch.nn.NLLLoss(weight=weight)
 
-	def forward(self, outputs, targets):
+	def forward(self, outputs, targets,mask=None):
 		return self.loss(torch.nn.functional.log_softmax(outputs, dim=1),targets)
+
+class brc_loss(torch.nn.Module):
+	def __init__(self, weight=None):
+		super().__init__()
+		self.loss = torch.nn.NLLLoss(weight=weight)
+	
+	def forward(self, output,target,mask):
+		#pdb.set_trace()
+		loss = self.loss(torch.nn.functional.log_softmax(output, dim=1),target)
+		loss = mask.view(-1,)*loss
+		loss = torch.sum(loss)/torch.sum(mask)
+
+		return loss*CLS_LOSS_COEF
+
+
 
 def load_pretrained(model,squeezenet):
 	name_squeezenet = [i for i,_ in squeezenet.state_dict().items()]
@@ -108,7 +123,7 @@ def train(model, enc=False):
 
 	dataset_train = Squeeze_Seg(ROOT_DIR,'train',ARGS_INPUT_TYPE)
 
-	dataset_val = Squeeze_Seg(ROOT_DIR,'train',ARGS_INPUT_TYPE)
+	dataset_val = Squeeze_Seg(ROOT_DIR,'val',ARGS_INPUT_TYPE)
 
 	loader = DataLoader(
 		dataset_train,
@@ -126,8 +141,10 @@ def train(model, enc=False):
 	print('Imbalance weights',weight)
 	if ARGS_CUDA:
 		weight = weight.cuda()
-		
-	criterion = CrossEntropyLoss2d(weight=weight)
+	if ARGS_BRC:	
+		criterion = brc_loss(weight=weight)
+	else:
+		criterion = CrossEntropyLoss2d(weight=weight)
 	savedir = ARGS_SAVE_DIR + ARGS_MODEL
 
 	if not os.path.exists(ARGS_SAVE_DIR):
@@ -183,7 +200,7 @@ def train(model, enc=False):
 			)
 
 			optimizer.zero_grad()
-			loss = criterion(output,label[:,0])
+			loss = criterion(output,label[:,0],mask)
 
 			loss.backward()
 			optimizer.step()
@@ -220,7 +237,7 @@ def train(model, enc=False):
 			mask = Variable(mask)
 
 			output = model(image,mask)
-			loss = criterion(output,label[:,0])
+			loss = criterion(output,label[:,0],mask)
 
 			val_epoch_loss.append(loss.item())
 
@@ -254,7 +271,7 @@ if __name__ == '__main__':
 
 	model.conv1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE), 64, 3, stride=(1,2), padding=1)
 	model.conv1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE),64, 1, stride=1, padding=0)
-
+	torch.set_num_threads(ARGS_NUM_WORKERS)
 
 
 	if ARGS_CUDA:
