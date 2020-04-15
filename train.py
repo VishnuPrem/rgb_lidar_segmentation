@@ -25,7 +25,10 @@ from torchvision.transforms import ToTensor, ToPILImage, Resize
 
 from dataloader import Squeeze_Seg
 from config import *
-from models.SqueezeSeg.SqueezeSeg import SqueezeSeg
+
+sys.path.append(ARGS_ROOT +'/models/'+ ARGS_MODEL_NAME)
+from SqueezeSeg import SqueezeSeg 
+#from models.SqueezeSeg.SqueezeSeg import SqueezeSeg
 from utils.util_iou_eval import iouEval, getColorEntry
 from utils.calculate_weights import load_class_weights
 
@@ -87,10 +90,17 @@ def load_pretrained(model,squeezenet):
 	
 	name_squeezenet.insert(2,0)
 	name_squeezenet.insert(2,0)
+	param_squeezenet.insert(2,0)
+	param_squeezenet.insert(2,0)
+	
+	if len(names_model)>100:
+		name_squeezenet = name_squeezenet[0:52]*2
+		param_squeezenet = param_squeezenet[0:52]*2
+
 	new_list = [0]*50
 	name_squeezenet.extend(new_list)
-	param_squeezenet.insert(2,0)
-	param_squeezenet.insert(2,0)
+
+
 	param_squeezenet.extend(new_list)
 	i = 0
 	
@@ -106,9 +116,10 @@ def load_pretrained(model,squeezenet):
 			pass
 		else:
 			#print(name)
+			#j+=1
 			new_dict[name] = squeeze_param
 		i += 1
-
+	
 	model.load_state_dict(new_dict)
 
 
@@ -121,9 +132,9 @@ def train(model, enc=False):
 
 	iouEvalTrain = iouEval(NUM_CLASSES)
 
-	dataset_train = Squeeze_Seg(ROOT_DIR,'train',ARGS_INPUT_TYPE)
+	dataset_train = Squeeze_Seg(ROOT_DIR,'train',ARGS_INPUT_TYPE_1,ARGS_INPUT_TYPE_2)
 
-	dataset_val = Squeeze_Seg(ROOT_DIR,'val',ARGS_INPUT_TYPE)
+	dataset_val = Squeeze_Seg(ROOT_DIR,'val',ARGS_INPUT_TYPE_1,ARGS_INPUT_TYPE_2)
 
 	loader = DataLoader(
 		dataset_train,
@@ -178,20 +189,22 @@ def train(model, enc=False):
 		iouEvalTrain = iouEval(NUM_CLASSES)
 		iouEvalval = iouEval(NUM_CLASSES)
 		
-		for step, (image,mask,label) in enumerate(loader):
+		for step, (image,image_2,mask,label) in enumerate(loader):
 			
 			start_time = time.time()
 
 			if ARGS_CUDA:
 				image = image.cuda()
+				image_2 = image_2.cuda()
 				label = label.cuda()
 				mask = mask.cuda()
 
 			image = Variable(image)
 			label = Variable(label)
 			mask = Variable(mask)
-			
-			output = model(image,mask)
+			image_2 = Variable(image_2)
+
+			output = model(image,image_2,mask)
 
 
 			iouEvalTrain.addBatch(
@@ -268,9 +281,15 @@ if __name__ == '__main__':
 	if ARGS_PRETRAINED:
 		squeezenet = models.squeezenet1_1(pretrained=True)
 		load_pretrained(model,squeezenet)
+	if ARGS_MODEL_NAME=='Dual_SqueezeSeg/':
+		model.conv1_1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1), 64, 3, stride=(1,2), padding=1)
+		model.conv1_1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1),64, 1, stride=1, padding=0)
 
-	model.conv1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE), 64, 3, stride=(1,2), padding=1)
-	model.conv1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE),64, 1, stride=1, padding=0)
+		model.conv2_1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_2), 64, 3, stride=(1,2), padding=1)
+		model.conv2_1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_2),64, 1, stride=1, padding=0)
+	else:
+		model.conv1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1), 64, 3, stride=(1,2), padding=1)
+		model.conv1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1),64, 1, stride=1, padding=0)
 	torch.set_num_threads(ARGS_NUM_WORKERS)
 
 

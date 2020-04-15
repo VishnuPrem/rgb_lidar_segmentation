@@ -45,13 +45,15 @@ class Image_SemanticSegmentation:
 		return len(self.image_list)
 
 class Squeeze_Seg:
-	def __init__(self, root,split,format_,co_transforms=None):
+	def __init__(self, root,split,format_1,format_2,co_transforms=None):
 		self.root = os.path.join(root, split)
 
 		self.data_stats = load_datastats()
 		print('[STATS] \n[Mean]:    {} \n[Std_dev]: {}'.format(self.data_stats[0,:,0].T,self.data_stats[0,:,1].T))
 
-		self.format = format_
+		self.format_1 = format_1
+		self.format_2 = format_2
+
 
 		self.image_list=[]
 		for (dirpath, dirnames, filenames) in walk(self.root):
@@ -89,16 +91,21 @@ class Squeeze_Seg:
 		
 		lidar_mask = torch.from_numpy((data[:,:,4]>0)*1.).float().unsqueeze(0)
 
-		inputs = torch.zeros((len(self.format),64,512),dtype = torch.float)
-		
-		for val,i in enumerate(self.format):
+		inputs = torch.zeros((len(self.format_1),64,512),dtype = torch.float)
+		inputs_2 = None
+		for val,i in enumerate(self.format_1):
 			inputs[val]=data_rep[i]
+
+		if format_2:
+			inputs_2 = torch.zeros((len(self.format_2),64,512),dtype = torch.float)
+			for val,i in enumerate(self.format_2):
+				inputs_2[val]=data_rep[i]
 
 		data[:,:,5][data[:,:,5]==-1]=0
 		label = torch.from_numpy(data[:,:,5]).long().unsqueeze(0)
 			
 
-		return inputs,lidar_mask,label
+		return inputs,input_2,lidar_mask,label
 
 	def __len__(self):
 		return len(self.image_list)
