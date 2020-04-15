@@ -1,4 +1,4 @@
-ARGS_ROOT = '/home/neil/cis_522/squeezeSeg/'
+ARGS_ROOT = '/data/Docker_Codebase/cis_522/squeezeSeg/'
 ROOT_DIR = '/data/Docker_Data/kitti_data/'
 IMG_WIDTH = 512
 ARGS_BRC = False
@@ -9,10 +9,10 @@ ARGS_NUM_WORKERS = 30
 ARGS_TRAIN_BATCH_SIZE=16
 ARGS_VAL_BATCH_SIZE=1
 ARGS_INPUT_TYPE_1 = 'XYZDI'
-ARGS_INPUT_TYPE_2 = 'XYZDI'
+ARGS_INPUT_TYPE_2 = 'RGB'
 CLS_LOSS_COEF = 15.0
 
-ARGS_MODEL_NAME = 'Dual_SqueezeSeg/'
+ARGS_MODEL_NAME = 'SqueezeSeg/'  # Dual_SqueezeSeg
 
 ARGS_MODEL = 'SqueezeSeg_6/'
 ARGS_SAVE_DIR = ARGS_ROOT + 'Saved_model/' 
