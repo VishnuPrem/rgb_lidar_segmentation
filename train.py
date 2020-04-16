@@ -26,8 +26,10 @@ from torchvision.transforms import ToTensor, ToPILImage, Resize
 from dataloader import Squeeze_Seg
 from config import *
 
-sys.path.append(ARGS_ROOT +'/models/'+ ARGS_MODEL_NAME)
-from SqueezeSeg import SqueezeSeg 
+sys.path.append(os.path.join(ARGS_ROOT,'/models/',ARGS_MODEL_NAME))
+module = __import__(ARGS_MODEL_NAME)
+Network = getattr(module,"Net")
+#from SqueezeSeg import SqueezeSeg 
 #from models.SqueezeSeg.SqueezeSeg import SqueezeSeg
 from utils.util_iou_eval import iouEval, getColorEntry
 from utils.calculate_weights import load_class_weights
@@ -276,20 +278,27 @@ def train(model, enc=False):
 			best_iou = iouVal
 
 if __name__ == '__main__':
-	model = SqueezeSeg(data_dict)
+	model = Network(data_dict)
 	
-	if ARGS_PRETRAINED:
-		squeezenet = models.squeezenet1_1(pretrained=True)
-		load_pretrained(model,squeezenet)
-	if ARGS_MODEL_NAME=='Dual_SqueezeSeg/':
+	
+	if ARGS_MODEL_NAME=='Dual_SqueezeSeg':
+		if ARGS_PRETRAINED:
+			squeezenet = models.squeezenet1_1(pretrained=True)
+			load_pretrained(model,squeezenet)
 		model.conv1_1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1), 64, 3, stride=(1,2), padding=1)
 		model.conv1_1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1),64, 1, stride=1, padding=0)
 
 		model.conv2_1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_2), 64, 3, stride=(1,2), padding=1)
 		model.conv2_1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_2),64, 1, stride=1, padding=0)
-	else:
+	elif ARGS_MODEL_NAME == 'SqueezeSeg':
+		if ARGS_PRETRAINED:
+			squeezenet = models.squeezenet1_1(pretrained=True)
+			load_pretrained(model,squeezenet)
 		model.conv1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1), 64, 3, stride=(1,2), padding=1)
 		model.conv1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1),64, 1, stride=1, padding=0)
+			
+
+
 	torch.set_num_threads(ARGS_NUM_WORKERS)
 
 

@@ -72,9 +72,9 @@ class FireDeconv(nn.Module):
 		return torch.cat([x_1,x_2],1)
 
 
-class SqueezeSeg(nn.Module):
+class Net(nn.Module):
 	def __init__(self, data_value):
-		super(SqueezeSeg, self).__init__()
+		super(Net, self).__init__()
 
 		self.data_value = data_value
 		self.conv1 = Conv(3, 64, 3, stride=(1,2), padding=1)

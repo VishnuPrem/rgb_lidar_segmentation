@@ -12,7 +12,7 @@ ARGS_INPUT_TYPE_1 = 'XYZDI'
 ARGS_INPUT_TYPE_2 = 'XYZDI'
 CLS_LOSS_COEF = 15.0
 
-ARGS_MODEL_NAME = 'Dual_SqueezeSeg/'
+ARGS_MODEL_NAME = 'Dual_SqueezeSeg'
 
 ARGS_MODEL = 'SqueezeSeg_6/'
 ARGS_SAVE_DIR = ARGS_ROOT + 'Saved_model/' 
@@ -35,6 +35,7 @@ from easydict import EasyDict as edict
 
 data_dict = edict()
 data_dict.CLASSES = ['unkwon', 'car', 'pedestrian', 'cyclist']
+data_dict.CHANNELS = ARGS_INPUT_TYPE_1
 data_dict.NUM_CLASSES = NUM_CLASSES
 # data_dict.NUM_CLASSES = 9
 data_dict.CLS_2_ID = dict(zip(data_dict.CLASSES, range(len(data_dict.CLASSES))))
