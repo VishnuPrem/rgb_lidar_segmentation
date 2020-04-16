@@ -95,8 +95,8 @@ class Squeeze_Seg:
 		inputs_2 = None
 		for val,i in enumerate(self.format_1):
 			inputs[val]=data_rep[i]
-
-		if format_2:
+		
+		if self.format_2:
 			inputs_2 = torch.zeros((len(self.format_2),64,512),dtype = torch.float)
 			for val,i in enumerate(self.format_2):
 				inputs_2[val]=data_rep[i]
@@ -105,7 +105,7 @@ class Squeeze_Seg:
 		label = torch.from_numpy(data[:,:,5]).long().unsqueeze(0)
 			
 
-		return inputs,input_2,lidar_mask,label
+		return inputs,inputs_2,lidar_mask,label
 
 	def __len__(self):
 		return len(self.image_list)

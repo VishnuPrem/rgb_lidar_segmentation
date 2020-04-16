@@ -239,19 +239,21 @@ def train(model, enc=False):
 
 		#print("\n ----------------  Epoch #", epoch, "------------------\n")
 
-		for step, (image,mask,label) in enumerate(loader_val):
+		for step, (image,image_2,mask,label) in enumerate(loader_val):
 			start_time = time.time()
 
 			if ARGS_CUDA:
 				image = image.cuda()
 				label = label.cuda()
 				mask = mask.cuda()
+				image_2 = image_2.cuda()
 
 			image = Variable(image)
 			label = Variable(label)
 			mask = Variable(mask)
-
-			output = model(image,mask)
+			image_2 = Variable(image_2)
+			
+			output = model(image,image_2,mask)
 			loss = criterion(output,label[:,0],mask)
 
 			val_epoch_loss.append(loss.item())
