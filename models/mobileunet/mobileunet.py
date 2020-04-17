@@ -1,3 +1,10 @@
+###############################################################
+# Network definition for MobilenetV2 based encoder with a Unet architecture
+#                             April 2020
+#           Neil Rodrigues | University of Pennsylvania
+###############################################################
+
+
 import pdb
 
 import torch
@@ -19,8 +26,10 @@ class Net(nn.Module):
         self.base_layers = list(self.base_model.children())
         
         self.base_layers = self.base_layers[0]
+        
         #print(self.base_layers[0])
         #self.base_layers[0] = nn.Conv2d(CHANNELS,64,kernel_size=(7,7),stride=(2,2),padding=(3,3),bias=False)
+        self.base_layers[0][0] = nn.Conv2d(CHANNELS,32,kernel_size=(3,3),stride=(2,2),padding=(1,1),bias=False)
         #print(self.base_layers[0])
         self.layer0 = nn.Sequential(*self.base_layers[:2]) # size=(N, 64/16, x.H/2, x.W/2)
         self.layer0_1x1 = convrelu(16,16, 1, 0)
@@ -99,7 +108,7 @@ class Net(nn.Module):
 
 def unit_test():
     num_minibatch = 2
-    num_channels = 3
+    num_channels = 5
     rgb = torch.randn(num_minibatch, num_channels, 64, 512).cuda(0)
     
     rtf_net = Net(num_channels,4).cuda(0)

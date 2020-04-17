@@ -1,3 +1,9 @@
+###############################################################
+# Network definition for Resnet18 based encoder with a Unet architecture
+#                             April 2020
+#           Neil Rodrigues | University of Pennsylvania
+###############################################################
+
 import torch
 import torch.nn as nn
 from torchvision import models

@@ -1,3 +1,10 @@
+###############################################################
+# 	Main code for training Semantic Segmentation Networks
+#                       April 2020
+#   	Neil Rodrigues | University of Pennsylvania
+###############################################################
+
+
 # TODO: tensorboardX
 # TODO: Best model saver
 # TODO: use pretrained backbone from pytorch
