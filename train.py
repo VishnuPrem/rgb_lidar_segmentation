@@ -26,7 +26,7 @@ from torchvision.transforms import ToTensor, ToPILImage, Resize
 from dataloader import Squeeze_Seg
 from config import *
 
-sys.path.append(os.path.join(ARGS_ROOT,'/models/',ARGS_MODEL_NAME))
+sys.path.append(os.path.join(ARGS_ROOT,'models',ARGS_MODEL_NAME+'/'))
 module = __import__(ARGS_MODEL_NAME)
 Network = getattr(module,"Net")
 #from SqueezeSeg import SqueezeSeg 
