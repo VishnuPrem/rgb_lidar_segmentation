@@ -19,9 +19,9 @@ def convrelu(in_channels, out_channels, kernel, padding):
 
 
 class Net(nn.Module):
-    def __init__(self, CHANNELS,NUM_CLASSES):
+    def __init__(self, data_dict):
         super(Net,self).__init__()
-
+        self.data_dict = data_dict
         self.base_model = models.mobilenet_v2(pretrained=True)
         self.base_layers = list(self.base_model.children())
         
@@ -29,7 +29,8 @@ class Net(nn.Module):
         
         #print(self.base_layers[0])
         #self.base_layers[0] = nn.Conv2d(CHANNELS,64,kernel_size=(7,7),stride=(2,2),padding=(3,3),bias=False)
-        self.base_layers[0][0] = nn.Conv2d(CHANNELS,32,kernel_size=(3,3),stride=(2,2),padding=(1,1),bias=False)
+
+        self.base_layers[0][0] = nn.Conv2d(len(data_dict.CHANNELS),32,kernel_size=(3,3),stride=(2,2),padding=(1,1),bias=False)
         #print(self.base_layers[0])
         self.layer0 = nn.Sequential(*self.base_layers[:2]) # size=(N, 64/16, x.H/2, x.W/2)
         self.layer0_1x1 = convrelu(16,16, 1, 0)
@@ -49,18 +50,18 @@ class Net(nn.Module):
         self.conv_up1 = convrelu(24 + 512, 256, 3, 1)
         self.conv_up0 = convrelu(16 + 256, 128, 3, 1)
 
-        self.conv_original_size0 = convrelu(CHANNELS, 16, 3, 1)
+        self.conv_original_size0 = convrelu(len(data_dict.CHANNELS), 16, 3, 1)
         self.conv_original_size1 = convrelu(16, 16, 3, 1)
         self.conv_original_size2 = convrelu(16 + 128, 16, 3, 1)
 
-        self.conv_last = nn.Conv2d(16, NUM_CLASSES, 1)
+        self.conv_last = nn.Conv2d(16, data_dict.NUM_CLASSES, 1)
 
     def forward(self, input, x2 ,mask):
         x_original = self.conv_original_size0(input)
         x_original = self.conv_original_size1(x_original)
 
         layer0 = self.layer0(input)
-        print('x_original',x_original.shape, 'layer0',layer0.shape)
+        #print('x_original',x_original.shape, 'layer0',layer0.shape)
         layer1 = self.layer1(layer0)
         
         layer2 = self.layer2(layer1)
@@ -70,30 +71,30 @@ class Net(nn.Module):
         layer4 = self.layer4(layer3)
         
         layer4 = self.layer4_1x1(layer4)
-        print('lowest feature size',layer4.shape)
+        #print('lowest feature size',layer4.shape)
         x = self.upsample(layer4)
         layer3 = self.layer3_1x1(layer3)
 
-        print('first concat',x.shape,layer3.shape)
+        #print('first concat',x.shape,layer3.shape)
         x = torch.cat([x, layer3], dim=1)
         x = self.conv_up3(x)
 
         x = self.upsample(x)
 
         layer2 = self.layer2_1x1(layer2)
-        print('second concat',x.shape,layer2.shape)
+        #print('second concat',x.shape,layer2.shape)
         x = torch.cat([x, layer2], dim=1)
         x = self.conv_up2(x)
 
         x = self.upsample(x)
         layer1 = self.layer1_1x1(layer1)
-        print('third concat',x.shape,layer1.shape)
+        #print('third concat',x.shape,layer1.shape)
         x = torch.cat([x, layer1], dim=1)
         x = self.conv_up1(x)
 
         x = self.upsample(x)
         layer0 = self.layer0_1x1(layer0)
-        print('fourth concat',x.shape,layer0.shape)
+        #print('fourth concat',x.shape,layer0.shape)
         x = torch.cat([x, layer0], dim=1)
         x = self.conv_up0(x)
 

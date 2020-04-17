@@ -5,7 +5,7 @@ ARGS_BRC = False
 
 #### DATALOADER ####
 NUM_CLASSES=4
-ARGS_NUM_WORKERS = 30
+ARGS_NUM_WORKERS = 10
 ARGS_TRAIN_BATCH_SIZE=16
 ARGS_VAL_BATCH_SIZE=1
 ARGS_INPUT_TYPE_1 = 'XYZDI'
@@ -13,10 +13,10 @@ ARGS_INPUT_TYPE_2 = 'RGB'
 CLS_LOSS_COEF = 15.0
 
 
-ARGS_MODEL_NAME = 'SqueezeSeg/'  # Dual_SqueezeSeg
+ARGS_MODEL_NAME = 'mobileunet'#'SqueezeSeg/'  # Dual_SqueezeSeg
 
 
-ARGS_MODEL = 'SqueezeSeg_6/'
+ARGS_MODEL = 'mobileunet_XYZDI/'
 ARGS_SAVE_DIR = ARGS_ROOT + 'Saved_model/' 
 ARGS_TRAIN_DIR = ARGS_ROOT
 ARGS_CUDA = True
