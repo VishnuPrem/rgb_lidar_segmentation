@@ -1,5 +1,8 @@
-ARGS_ROOT = '/data/Docker_Codebase/cis_522/squeezeSeg/'
-ROOT_DIR = '/data/Docker_Data/kitti_data/'
+# repo 
+ARGS_ROOT = './'
+# data
+ROOT_DIR = 'E:/pgm_output/'
+
 IMG_WIDTH = 512
 ARGS_BRC = False
 
@@ -13,10 +16,10 @@ ARGS_INPUT_TYPE_2 = 'RGB'
 CLS_LOSS_COEF = 15.0
 
 
-ARGS_MODEL_NAME = 'mobileunet'#'SqueezeSeg/'  # Dual_SqueezeSeg
+ARGS_MODEL_NAME = 'fcn_32' #'mobileunet'#'SqueezeSeg/'  # Dual_SqueezeSeg
 
 
-ARGS_MODEL = 'mobileunet_XYZDI/'
+ARGS_MODEL = 'fcn_32_XYZDI/'
 ARGS_SAVE_DIR = ARGS_ROOT + 'Saved_model/' 
 ARGS_TRAIN_DIR = ARGS_ROOT
 ARGS_CUDA = True
@@ -68,3 +71,4 @@ data_dict.RANDOM_FLIPPING = False
 # x, y, z, intensity, distance for Normalization
 data_dict.INPUT_MEAN = np.array([[[10.88, 0.23, -1.04, 0.21, 12.12]]])
 data_dict.INPUT_STD = np.array([[[11.47, 6.91, 0.86, 0.16, 12.32]]])
+
