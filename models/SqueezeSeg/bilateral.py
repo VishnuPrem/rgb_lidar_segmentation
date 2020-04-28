@@ -1,3 +1,10 @@
+###############################################################
+# 	 		Module definition for Recurrent CRF
+#                       April 2020
+#   	Aayush Jindal | University of Pennsylvania
+#               Adapted from Benjamin Young
+###############################################################
+
 
 import torch
 import torch.nn as nn

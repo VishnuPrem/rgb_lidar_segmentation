@@ -1,3 +1,10 @@
+###############################################################
+# 	 Network definition for Dual encoder based SqueezeSeg
+#                       April 2020
+#   	Neil Rodrigues | University of Pennsylvania
+#               Adapted from Benjamin Young
+###############################################################
+
 import sys
 import torch
 sys.path.append('../../')
