@@ -1,38 +1,26 @@
-ARGS_ROOT = '/data/Docker_Codebase/cis_522/squeezeSeg/'
-ROOT_DIR = '/data/Docker_Data/kitti_data/'
-IMG_WIDTH = 512
-ARGS_BRC = False
 
-#### DATALOADER ####
-NUM_CLASSES=4
-ARGS_NUM_WORKERS = 10
-ARGS_TRAIN_BATCH_SIZE=16
-ARGS_VAL_BATCH_SIZE=1
+ARGS_ROOT = '/data/Docker_Codebase/cis_522/squeezeSeg/'
+ROOT_DIR = '/data/Docker_Data/kitti_data/' 
+
+ARGS_MODEL_NAME = 'Dual_SqueezeSeg'
+ARGS_MODEL = 'ss_dual_XYZDI_DIRGB/'
+
+ARGS_SAVE_DIR = ARGS_ROOT +'Saved_model/' + ARGS_MODEL + 'Inference/'
+
+ARGS_INFERENCE_MODEL = ARGS_ROOT + 'Saved_model/' + ARGS_MODEL + 'model_best.pth'
+NUM_CLASSES = 4
+
 ARGS_INPUT_TYPE_1 = 'XYZDI'
 ARGS_INPUT_TYPE_2 = 'DIRGB'
-CLS_LOSS_COEF = 15.0
 
 
-ARGS_MODEL_NAME = 'Dual_SqueezeSeg'#'SqueezeSeg/'  # Dual_SqueezeSeg
+ARGS_VAL_BATCH_SIZE = 1
+ARGS_CUDA=True
+
+ARGS_NUM_WORKERS = 5
 
 
-ARGS_MODEL = 'dual_squeezeseg_XYZDI/'
-ARGS_SAVE_DIR = ARGS_ROOT + 'Saved_model/' 
-ARGS_TRAIN_DIR = ARGS_ROOT
-ARGS_CUDA = True
-ARGS_PRETRAINED = True
-
-OPT_LEARNING_RATE_INIT 	= 1e-3
-
-OPT_BETAS 		= (0.9, 0.999)
-OPT_EPS_LOW 		= 1e-08
-OPT_WEIGHT_DECAY 	= 1e-4
-
-ARGS_NUM_EPOCHS = 2000
-
-
-####### Recurrent layer Config #########
-import numpy as np	
+import numpy as np
 from easydict import EasyDict as edict
 
 data_dict = edict()
