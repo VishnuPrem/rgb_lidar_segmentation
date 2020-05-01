@@ -18,7 +18,7 @@ class Net(nn.Module):
   def __init__(self):
 
     n_class = 4
-    super(CNN_baseline, self).__init__()
+    super(Net, self).__init__()
 
     """First Conv layer 
        input - 64*512*8 
