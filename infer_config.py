@@ -2,22 +2,22 @@
 ARGS_ROOT = '/data/Docker_Codebase/cis_522/squeezeSeg/'
 ROOT_DIR = '/data/Docker_Data/kitti_data/' 
 
-ARGS_MODEL_NAME = 'efficientunet'
-ARGS_MODEL = 'effnet/'
+ARGS_MODEL_NAME = 'Dual_SqueezeSeg'
+ARGS_MODEL = 'ss_XYZDI_DIRGB/'
 
-ARGS_SAVE_DIR = ARGS_ROOT +'Saved_model/' + ARGS_MODEL + 'Inference/'
+ARGS_SAVE_DIR = ARGS_ROOT +'final_saved_models/' + ARGS_MODEL + 'Inference/'
 
-ARGS_INFERENCE_MODEL = ARGS_ROOT + 'Saved_model/' + ARGS_MODEL + 'model_best.pth'
+ARGS_INFERENCE_MODEL = ARGS_ROOT + 'final_saved_models/' + ARGS_MODEL + 'model_best.pth'
 NUM_CLASSES = 4
 
 ARGS_INPUT_TYPE_1 = 'XYZDI'
 ARGS_INPUT_TYPE_2 = 'DIRGB'
 
 
-ARGS_VAL_BATCH_SIZE = 1
+ARGS_VAL_BATCH_SIZE = 2
 ARGS_CUDA=True
 
-ARGS_NUM_WORKERS = 5
+ARGS_NUM_WORKERS = 15
 
 
 import numpy as np

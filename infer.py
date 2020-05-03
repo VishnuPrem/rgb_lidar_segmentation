@@ -67,7 +67,7 @@ def test(model):
 
 	iouEvalVal = iouEval(NUM_CLASSES)
 	labels = np.array([(0,0,0),(255,0,0),(0,255,0),(0,0,255)] )
-
+	model.eval()
 	total_time=0
 	for step, (image,image_2,mask,label) in enumerate(loader_val):
 			
@@ -91,26 +91,26 @@ def test(model):
 		#pdb.set_trace()
 		iouEvalVal.addBatch(output.max(1)[1].unsqueeze(1).data, label.data)
 		
-		label_out = output[0].max(0)[1].byte().cpu().data
-		label_out = torch.Tensor(labels[label_out])
+		#label_out = output[0].max(0)[1].byte().cpu().data
+		#label_out = torch.Tensor(labels[label_out])
 		#label_out = ToPILImage()(label_out)
 	    
-		label_in = label.squeeze().cpu()
-		depth = torch.cat([image[0,3:4,:,:].cpu()]*3).permute(1,2,0)
+		#label_in = label.squeeze().cpu()
+		#depth = torch.cat([image[0,3:4,:,:].cpu()]*3).permute(1,2,0)
 
-		depth = (depth-depth.min())/(depth.max()-depth.min())
+		#depth = (depth-depth.min())/(depth.max()-depth.min())
 
 		#pdb.set_trace()
-		label_in = torch.Tensor(labels[label_in])
-		im = image_2.cpu().squeeze()[2:].permute(1,2,0)	
+		#label_in = torch.Tensor(labels[label_in])
+		#im = image_2.cpu().squeeze()[2:].permute(1,2,0)	
 		#infer_label = np.vstack((label_in,label_out))
-		infer_label = torch.cat((im,depth,label_in/255,label_out/255),0)
-		infer_label = ToPILImage()(infer_label.permute(2,0,1))#.convert('RGB')
-		filename = ARGS_SAVE_DIR + 'infer_' + str(step).zfill(6)+'.png'
-		os.makedirs(os.path.dirname(filename),exist_ok=True)
+		#infer_label = torch.cat((im,depth,label_in/255,label_out/255),0)
+		#infer_label = ToPILImage()(infer_label.permute(2,0,1))#.convert('RGB')
+		#filename = ARGS_SAVE_DIR + 'infer_' + str(step).zfill(6)+'.png'
+		#os.makedirs(os.path.dirname(filename),exist_ok=True)
 		
-		infer_label.save(filename)
-		print('Saved file to ',filename)
+		#infer_label.save(filename)
+		#print('Saved file to ',filename)
 
 		#pdb.set_trace()
 	iouVal, iou_val_classes = iouEvalVal.getIoU()

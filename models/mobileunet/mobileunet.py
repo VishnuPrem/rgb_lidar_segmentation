@@ -72,7 +72,7 @@ class Net(nn.Module):
         layer4 = self.layer4(layer3)
         
         layer4 = self.layer4_1x1(layer4)
-        pdb.set_trace()
+        #pdb.set_trace()
         #print('lowest feature size',layer4.shape)
         x = self.upsample(layer4)
         layer3 = self.layer3_1x1(layer3)
