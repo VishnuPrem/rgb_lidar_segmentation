@@ -1,6 +1,8 @@
 *a_bilateral.py
 *a_recurrent.py
 
+
+core
 Saved_model/*
 data/*
 model_best*

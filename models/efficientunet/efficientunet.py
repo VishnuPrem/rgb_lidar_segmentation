@@ -6,6 +6,7 @@
 
 
 import pdb
+from efficientnet_pytorch import EfficientNet 
 
 import torch
 import torch.nn as nn
@@ -22,34 +23,37 @@ class Net(nn.Module):
     def __init__(self, data_dict):
         super(Net,self).__init__()
         self.data_dict = data_dict
-        self.base_model = models.mobilenet_v2(pretrained=True)
-        self.base_layers = list(self.base_model.children())
+        self.base_model = EfficientNet.from_pretrained('efficientnet-b4',in_channels=5) 
         
-        self.base_layers = self.base_layers[0]
+        #self.base_model = models.mobilenet_v2(pretrained=True)
+        self.base_layers = list(self.base_model.children())
+        self.base_layers[0].in_channels=5
+        #pdb.set_trace()
+        #self.base_layers = self.base_layers[0]
         
         #print(self.base_layers[0])
         #self.base_layers[0] = nn.Conv2d(CHANNELS,64,kernel_size=(7,7),stride=(2,2),padding=(3,3),bias=False)
 
-        self.base_layers[0][0] = nn.Conv2d(len(data_dict.CHANNELS),32,kernel_size=(3,3),stride=(2,2),padding=(1,1),bias=False)
+        #self.base_layers[0][0] = nn.Conv2d(len(data_dict.CHANNELS),32,kernel_size=(3,3),stride=(2,2),padding=(1,1),bias=False)
         #print(self.base_layers[0])
-        self.layer0 = nn.Sequential(*self.base_layers[:2]) # size=(N, 64/16, x.H/2, x.W/2)
-        self.layer0_1x1 = convrelu(16,16, 1, 0)
-        self.layer1 = nn.Sequential(*self.base_layers[2:4]) # size=(N, 64/24, x.H/4, x.W/4)
-        self.layer1_1x1 = convrelu(24, 24, 1, 0)
-        self.layer2 = nn.Sequential(*self.base_layers[4:7]) # size=(N, 128/32, x.H/8, x.W/8)
-        self.layer2_1x1 = convrelu(32, 32, 1, 0)
-        self.layer3 = nn.Sequential(*self.base_layers[7:11])  # size=(N, 256/64, x.H/16, x.W/16)
-        self.layer3_1x1 = convrelu(64, 64, 1, 0)
-        self.layer4 = nn.Sequential(*self.base_layers[11:])  # size=(N, 512/1280, x.H/32, x.W/32)
+        self.layer0 = nn.Sequential(*self.base_layers[:2],*self.base_layers[2][0:2]) # size=(N, 64/16, x.H/2, x.W/2)
+        self.layer0_1x1 = convrelu(24,24, 1, 0)
+        self.layer1 = nn.Sequential(*self.base_layers[2][2:6]) # size=(N, 64/24, x.H/4, x.W/4)
+        self.layer1_1x1 = convrelu(32, 32, 1, 0)
+        self.layer2 = nn.Sequential(*self.base_layers[2][6:10]) # size=(N, 128/32, x.H/8, x.W/8)
+        self.layer2_1x1 = convrelu(56, 56, 1, 0)
+        self.layer3 = nn.Sequential(*self.base_layers[2][10:22])  # size=(N, 256/64, x.H/16, x.W/16)
+        self.layer3_1x1 = convrelu(160, 160, 1, 0)
+        self.layer4 = nn.Sequential(*self.base_layers[2][22:],*self.base_layers[3:5])  # size=(N, 512/1280, x.H/32, x.W/32)
         
-        self.layer4_1x1 = convrelu(1280, 1280, 1, 0)
+        self.layer4_1x1 = convrelu(1792, 1792, 1, 0)
 
         self.upsample = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
         
-        self.conv_up3 = convrelu(64 + 1280, 1280, 3, 1)
-        self.conv_up2 = convrelu(32 + 1280, 512, 3, 1)
-        self.conv_up1 = convrelu(24 + 512, 256, 3, 1)
-        self.conv_up0 = convrelu(16 + 256, 128, 3, 1)
+        self.conv_up3 = convrelu(160 + 1792, 1280, 3, 1)
+        self.conv_up2 = convrelu(56 + 1280, 512, 3, 1)
+        self.conv_up1 = convrelu(32 + 512, 256, 3, 1)
+        self.conv_up0 = convrelu(24 + 256, 128, 3, 1)
 
         self.conv_original_size0 = convrelu(len(data_dict.CHANNELS), 16, 3, 1)
         self.conv_original_size1 = convrelu(16, 16, 3, 1)
@@ -72,7 +76,7 @@ class Net(nn.Module):
         layer4 = self.layer4(layer3)
         
         layer4 = self.layer4_1x1(layer4)
-        pdb.set_trace()
+        #pdb.set_trace()
         #print('lowest feature size',layer4.shape)
         x = self.upsample(layer4)
         layer3 = self.layer3_1x1(layer3)

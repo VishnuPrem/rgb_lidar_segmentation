@@ -15,7 +15,7 @@ import torch.nn.functional as F
 
 
 class Net(nn.Module):
-  def __init__(self):
+  def __init__(self,data_dict):
 
     n_class = 4
     super(Net, self).__init__()
@@ -88,7 +88,7 @@ class Net(nn.Module):
         if m.bias is not None:
           nn.init.constant_(m.bias,0)
 
-  def forward(self, x):
+  def forward(self, x,x2,mask):
     
     x = self.maxp1( F.relu ( self.conv1_2 ( F.relu ( self.conv1_1(x) ) ) ) )
     x = self.maxp2( F.relu ( self.conv2_2 ( F.relu ( self.conv2_1(x) ) ) ) )

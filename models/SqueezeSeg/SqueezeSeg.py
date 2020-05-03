@@ -84,8 +84,8 @@ class Net(nn.Module):
 		super(Net, self).__init__()
 
 		self.data_value = data_value
-		self.conv1 = Conv(5, 64, 3, stride=(1,2), padding=1)
-		self.conv1_skip = Conv(5, 64, 1, stride=1, padding=0)
+		self.conv1 = Conv(8, 64, 3, stride=(1,2), padding=1)
+		self.conv1_skip = Conv(8, 64, 1, stride=1, padding=0)
 		self.pool1 = nn.MaxPool2d(kernel_size=3, stride=(1,2), padding=(1,0),ceil_mode=True)
 
 		self.fire2 = Fire(64, 16, 64)

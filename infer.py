@@ -61,17 +61,17 @@ def test(model):
 		dataset_val,
 		num_workers = ARGS_NUM_WORKERS,
 		batch_size = ARGS_VAL_BATCH_SIZE,
-		shuffle = True)
+		shuffle = False)
 
 	weight = load_class_weights().cuda()
 
 	iouEvalVal = iouEval(NUM_CLASSES)
 	labels = np.array([(0,0,0),(255,0,0),(0,255,0),(0,0,255)] )
 
-
+	total_time=0
 	for step, (image,image_2,mask,label) in enumerate(loader_val):
 			
-		start_time = time.time()
+		#start_time = time.time()
 
 		if ARGS_CUDA:
 			image = image.cuda()
@@ -83,8 +83,11 @@ def test(model):
 		label = Variable(label)
 		mask = Variable(mask)
 		image_2 = Variable(image_2)
-
+		start_time = time.time()
 		output = model(image,image_2,mask)
+		cycle_time = time.time()-start_time
+		total_time += cycle_time
+
 		#pdb.set_trace()
 		iouEvalVal.addBatch(output.max(1)[1].unsqueeze(1).data, label.data)
 		
@@ -105,7 +108,7 @@ def test(model):
 		infer_label = ToPILImage()(infer_label.permute(2,0,1))#.convert('RGB')
 		filename = ARGS_SAVE_DIR + 'infer_' + str(step).zfill(6)+'.png'
 		os.makedirs(os.path.dirname(filename),exist_ok=True)
-		#pdb.set_trace()
+		
 		infer_label.save(filename)
 		print('Saved file to ',filename)
 
@@ -116,7 +119,7 @@ def test(model):
 	print('Car IOU :',iou_val_classes[1])
 	print('Pedestrian IOU :', iou_val_classes[2])
 	print('Bicycle IOU :', iou_val_classes[3])
-
+	print('Average time per inference',total_time/step)
 	
 
 
