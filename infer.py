@@ -22,24 +22,24 @@ import torchvision.models as models
 from torch.optim import SGD, Adam
 from torch.autograd import Variable
 
-from dataloader import Squeeze_Seg
+from utils.dataloader import Squeeze_Seg
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, ToPILImage, Resize
 
 from utils.util_iou_eval import iouEval
 
 
-from dataloader import Squeeze_Seg
-from infer_config import *
+#from dataloader import Squeeze_Seg
+#from infer_config import *
 
-sys.path.append(os.path.join(ARGS_ROOT,'models',ARGS_MODEL_NAME+'/'))
+#sys.path.append(os.path.join(ARGS_ROOT,'models',ARGS_MODEL_NAME+'/'))
 
-module = __import__(ARGS_MODEL_NAME)
-Network = getattr(module,"Net")
+#module = __import__(ARGS_MODEL_NAME)
+#Network = getattr(module,"Net")
 
 from utils.util_iou_eval import iouEval, getColorEntry
 from utils.calculate_weights import load_class_weights
-
+import pdb
 
 def load_my_state_dict(model, state_dict):
     
@@ -52,9 +52,23 @@ def load_my_state_dict(model, state_dict):
         own_state[name].copy_(param)
     return model
 
-def test(model):
-	print('Total Number of classes is {}'.format(NUM_CLASSES))
+def load_weights_serially(model, state_dict):
+    
+    own_state = model.state_dict()
+    params = [param for _,param in state_dict.items()]
+    names = [name for name in own_state]
+    #pdb.set_trace()
+    for i in range(len(names)):
+        own_state[names[i]].copy_(params[i])
+    
+    return model
 
+
+
+
+def test(model,loader_val,ARGS_CUDA):
+	#print('Total Number of classes is {}'.format(NUM_CLASSES))
+	'''
 	dataset_val = Squeeze_Seg(ROOT_DIR,'val',ARGS_INPUT_TYPE_1,ARGS_INPUT_TYPE_2)
 
 	loader_val = DataLoader(
@@ -62,10 +76,10 @@ def test(model):
 		num_workers = ARGS_NUM_WORKERS,
 		batch_size = ARGS_VAL_BATCH_SIZE,
 		shuffle = False)
-
+	'''
 	weight = load_class_weights().cuda()
 
-	iouEvalVal = iouEval(NUM_CLASSES)
+	iouEvalVal = iouEval(4)
 	labels = np.array([(0,0,0),(255,0,0),(0,255,0),(0,0,255)] )
 	model.eval()
 	total_time=0
@@ -91,6 +105,7 @@ def test(model):
 		#pdb.set_trace()
 		iouEvalVal.addBatch(output.max(1)[1].unsqueeze(1).data, label.data)
 		
+		
 		#label_out = output[0].max(0)[1].byte().cpu().data
 		#label_out = torch.Tensor(labels[label_out])
 		#label_out = ToPILImage()(label_out)
@@ -114,13 +129,14 @@ def test(model):
 
 		#pdb.set_trace()
 	iouVal, iou_val_classes = iouEvalVal.getIoU()
-	print('Average IOU :',iouVal)
-	print('Background IOU :',iou_val_classes[0])
-	print('Car IOU :',iou_val_classes[1])
-	print('Pedestrian IOU :', iou_val_classes[2])
-	print('Bicycle IOU :', iou_val_classes[3])
-	print('Average time per inference',total_time/step)
+	print('[IOU] Average | Background | Car | Pedestrian | Bicycle |  FPS')
+	#pdb.set_trace()
+	print("      {:.2f}   |    {:.2f}   |{:.2f}|    {:.2f}   |   {:.2f}  | {:.2f}"\
+		.format(iouVal.item()*100,iou_val_classes[0].item()*100,iou_val_classes[1].item()*100,iou_val_classes[2].item()*100,\
+		iou_val_classes[3].item()*100, step/total_time))
+
 	
+		
 
 
 

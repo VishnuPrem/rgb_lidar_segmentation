@@ -1,9 +1,8 @@
-
 ARGS_ROOT = '/data/Docker_Codebase/cis_522/squeezeSeg/'
 ROOT_DIR = '/data/Docker_Data/kitti_data/' 
 
-ARGS_MODEL_NAME = 'Dual_SqueezeSeg'
-ARGS_MODEL = 'ss_XYZDI_DIRGB/'
+ARGS_MODEL_NAME = 'efficientunet'
+ARGS_MODEL = 'effnet/'
 
 ARGS_SAVE_DIR = ARGS_ROOT +'final_saved_models/' + ARGS_MODEL + 'Inference/'
 

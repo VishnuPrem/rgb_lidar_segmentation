@@ -4,6 +4,8 @@ import torch
 import random
 import numpy as np
 from os import walk
+import sys
+sys.path.append('../')
 from config import *
 from PIL import Image
 from torch.utils.data import Dataset
@@ -49,7 +51,7 @@ class Squeeze_Seg:
 		self.root = os.path.join(root, split)
 
 		self.data_stats = load_datastats()
-		print('[STATS] \n[Mean]:    {} \n[Std_dev]: {}'.format(self.data_stats[0,:,0].T,self.data_stats[0,:,1].T))
+		#print('[STATS] \n[Mean]:    {} \n[Std_dev]: {}'.format(self.data_stats[0,:,0].T,self.data_stats[0,:,1].T))
 
 		self.format_1 = format_1
 		self.format_2 = format_2

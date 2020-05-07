@@ -21,9 +21,9 @@ class Net(nn.Module):
 
         self.base_model = models.resnet18(pretrained=True)
         self.base_layers = list(self.base_model.children())
-        print(self.base_layers[0])
+        #print(self.base_layers[0])
         self.base_layers[0] = nn.Conv2d(len(data_value.CHANNELS),64,kernel_size=(7,7),stride=(2,2),padding=(3,3),bias=False)
-        print(self.base_layers[0])
+        #print(self.base_layers[0])
         self.layer0 = nn.Sequential(*self.base_layers[:3]) # size=(N, 64, x.H/2, x.W/2)
         self.layer0_1x1 = convrelu(64, 64, 1, 0)
         self.layer1 = nn.Sequential(*self.base_layers[3:5]) # size=(N, 64, x.H/4, x.W/4)

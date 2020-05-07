@@ -23,7 +23,7 @@ from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from torchvision.transforms import ToTensor, ToPILImage, Resize
 
-from dataloader import Squeeze_Seg
+from utils.dataloader import Squeeze_Seg
 from config import *
 
 sys.path.append(os.path.join(ARGS_ROOT,'models',ARGS_MODEL_NAME+'/'))

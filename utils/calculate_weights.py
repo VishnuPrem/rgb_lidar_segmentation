@@ -1,3 +1,10 @@
+#               Calculating imbalanced weights
+#                       April 2020
+#       Neil Rodrigues | University of Pennsylvania
+###############################################################
+
+
+
 import glob
 import os
 import PIL.Image
@@ -20,7 +27,7 @@ from os import walk
 def load_datastats():
     config = configparser.ConfigParser()
     config.sections()
-    config.read(ARGS_TRAIN_DIR + "/data_stats.ini" )
+    config.read(ARGS_TRAIN_DIR + "/utils/data_stats.ini" )
     
     data_stats = np.ones([1,5,2])
     
@@ -38,7 +45,7 @@ def load_datastats():
 def load_class_weights():
     config = configparser.ConfigParser()
     config.sections()
-    config.read(ARGS_TRAIN_DIR + "/class_weights.ini" )
+    config.read(ARGS_TRAIN_DIR + "/utils/class_weights.ini" )
     
     weights_mat = torch.ones([1,NUM_CLASSES])
     weights_mat[0,0] = float(config['ClassWeights']['background'])
@@ -148,13 +155,13 @@ def main():
 
 
 
-    with open(ARGS_TRAIN_DIR + "/class_weights.ini", "w") as configfile:
+    with open(ARGS_TRAIN_DIR + "/utils/class_weights.ini", "w") as configfile:
         config.write(configfile)
-    with open(ARGS_TRAIN_DIR + "/data_stats.ini", "w") as configfile:
+    with open(ARGS_TRAIN_DIR + "/utils/data_stats.ini", "w") as configfile:
         config_stats.write(configfile)
 
     print("[pst class weights] Saved class weights to {}".format(
-          ARGS_TRAIN_DIR + "class_weights.ini")
+          ARGS_TRAIN_DIR + "/utils/class_weights.ini")
          )
 
 if __name__ == '__main__':
