@@ -1,4 +1,4 @@
-# SqueezeSeg for RGB-Lidar Semantic Segmentation
+# RGB-Lidar Semantic Segmentation
 
 This code was trained and tested in the following enviorenment
 
