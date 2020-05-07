@@ -1,5 +1,5 @@
 ###############################################################
-# Network definition for Resnet18 based encoder with a FCN architecture
+# Network definition for Resnet34 based encoder with a FCN architecture
 #                             April 2020
 #           Neil Rodrigues, Ravi Konkimalla | University of Pennsylvania
 ###############################################################

@@ -4,13 +4,6 @@
 #   	Neil Rodrigues | University of Pennsylvania
 ###############################################################
 
-
-# TODO: tensorboardX
-# TODO: Best model saver
-# TODO: use pretrained backbone from pytorch
-
-
-
 import os
 import random 
 import time
@@ -36,8 +29,7 @@ from config import *
 sys.path.append(os.path.join(ARGS_ROOT,'models',ARGS_MODEL_NAME+'/'))
 module = __import__(ARGS_MODEL_NAME)
 Network = getattr(module,"Net")
-#from SqueezeSeg import SqueezeSeg 
-#from models.SqueezeSeg.SqueezeSeg import SqueezeSeg
+
 from utils.util_iou_eval import iouEval, getColorEntry
 from utils.calculate_weights import load_class_weights
 
@@ -55,15 +47,7 @@ class ImageTransform(object):
 		sup_labels[np.logical_or(sup_labels<=0,sup_labels>=4)]=0
 		target = Image.fromarray(sup_labels)
 		
-		#th = 64
-		#tw = 512
 
-		#x1 = random.randint(0, w - tw)
-		#y1 = random.randint(0, h - th)
-
-		#target = target.crop((x1, y1, x1 + tw, y1 + th))
-		#input = input.crop((x1, y1, x1 + tw, y1 + th))
-		#print(input.size,target.size)
 		input = ToTensor()(input)
 		target = torch.from_numpy(np.array(target)).long().unsqueeze(0)
 
@@ -243,9 +227,6 @@ def train(model, enc=False):
 
 		model.eval()
 
-
-		#print("\n ----------------  Epoch #", epoch, "------------------\n")
-
 		for step, (image,image_2,mask,label) in enumerate(loader_val):
 			start_time = time.time()
 
@@ -288,30 +269,9 @@ def train(model, enc=False):
 
 if __name__ == '__main__':
 	model = Network(data_dict)
-	
-	
-	if ARGS_MODEL_NAME=='Dual_SqueezeSeg':
-		if ARGS_PRETRAINED:
-			squeezenet = models.squeezenet1_1(pretrained=True)
-			load_pretrained(model,squeezenet)
-		model.conv1_1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1), 64, 3, stride=(1,2), padding=1)
-		model.conv1_1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1),64, 1, stride=1, padding=0)
-
-		model.conv2_1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_2), 64, 3, stride=(1,2), padding=1)
-		model.conv2_1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_2),64, 1, stride=1, padding=0)
-	elif ARGS_MODEL_NAME == 'SqueezeSeg':
-		if ARGS_PRETRAINED:
-			squeezenet = models.squeezenet1_1(pretrained=True)
-			load_pretrained(model,squeezenet)
-		model.conv1.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1), 64, 3, stride=(1,2), padding=1)
-		model.conv1_skip.conv = nn.Conv2d(len(ARGS_INPUT_TYPE_1),64, 1, stride=1, padding=0)
-			
-
-
 	torch.set_num_threads(ARGS_NUM_WORKERS)
-
-
+	
 	if ARGS_CUDA:
 		model = model.cuda()
-
+	
 	train(model)

@@ -8,7 +8,7 @@ NUM_CLASSES=4
 ARGS_NUM_WORKERS = 5
 ARGS_TRAIN_BATCH_SIZE=16
 ARGS_VAL_BATCH_SIZE=1
-ARGS_INPUT_TYPE_1 = 'XYZDI'
+ARGS_INPUT_TYPE_1 = 'XYZDIRGB'
 ARGS_INPUT_TYPE_2 = 'DIRGB'
 CLS_LOSS_COEF = 15.0
 
@@ -38,6 +38,7 @@ from easydict import EasyDict as edict
 data_dict = edict()
 data_dict.CLASSES = ['unkwon', 'car', 'pedestrian', 'cyclist']
 data_dict.CHANNELS = ARGS_INPUT_TYPE_1
+data_dict.CHANNELS2 = ARGS_INPUT_TYPE_2
 data_dict.NUM_CLASSES = NUM_CLASSES
 # data_dict.NUM_CLASSES = 9
 data_dict.CLS_2_ID = dict(zip(data_dict.CLASSES, range(len(data_dict.CLASSES))))

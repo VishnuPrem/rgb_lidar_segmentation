@@ -1,6 +1,6 @@
 ###############################################################
 # Network definition for Fully Convolutional Network FCN-32
-#                             April 2020
+#                      April 2020
 #           Ravi Teja | University of Pennsylvania
 ###############################################################
 
