@@ -13,7 +13,6 @@ numpy = 1.15.0
 |-------------------------|
 |![result](/report/2d_res34fcn.gif) | 
 |  Ground truths |
-|-------------------------|
 | ![result](/report/2d_ground_truth.gif) |
 
 ### Download Data and trained model weights
