@@ -9,9 +9,12 @@ PIL = 6.1.0
 numpy = 1.15.0
 
 ### Example results
-Sample outputs             |  Sample Inputs
-:-------------------------:|:-------------------------:
-![result](/report/2d_res34fcn.gif) | ![result](/report/2d_ground_truth.gif)
+| ResFcn_34 Output  |           
+|-------------------------|
+|![result](/report/2d_res34fcn.gif) | 
+|  Ground truths |
+|-------------------------|
+| ![result](/report/2d_ground_truth.gif) |
 
 ### Download Data and trained model weights
 The data[Lidar + RGB] was converted to PGM representation taking the form of a 64x512 image.
