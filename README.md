@@ -88,6 +88,7 @@ python3 inference_table.py
 ```
 
 The output should look like this
+
 ![result](/report/class_iou.png)
 
 ### Inference on trained models
